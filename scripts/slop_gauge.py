@@ -211,6 +211,10 @@ def fmt_report(m, title=""):
         f"结构: 三段式 {s['triads']} 判断排比 {s['judgment_triads']} 否定排比 {s['negation_contrast']} 序数链 {s['ordinal_chains']} 模糊归因 {s['vague_attribution']} 从X到Y {s['from_to_jumps']} 套路开头 {s['stamp_open']} 升华结尾 {s['lift_end']}",
         f"得分 {m['score']}/100（≥55 机械参考线；门禁语义见 de-ai 路由 SKILL.md）",
     ]
+    # ecommerce 档的罚分大头在极限词：不印出来，用户只会看到一个没有理由的低分
+    if m["profile"] == "ecommerce" and "per_1000" in m["adlaw"]:
+        a = m["adlaw"]
+        rows.insert(2, f"广告法极限词: {a['total']} 处 / 千字 {a['per_1000']}  高位: {a['top']}（本档重罚，改写期就要替换）")
     return head + "\n" + "\n".join(rows) + (f"\n{title}" if title else "")
 
 def fmt_diff(ma, mb):
@@ -227,6 +231,9 @@ def fmt_diff(ma, mb):
         ("总分", ma["score"], mb["score"]),
     ]
     lines = ["slop-gauge diff（原文 → 改后）"]
+    a1, a2 = ma.get("adlaw") or {}, mb.get("adlaw") or {}
+    if "per_1000" in a1 or "per_1000" in a2:
+        pairs.insert(1, ("广告法极限词/千字", a1.get("per_1000", 0.0), a2.get("per_1000", 0.0)))
     for label, k1, k2 in pairs:
         arrow = "↓" if k2 < k1 else ("↑" if k2 > k1 else "→")
         lines.append(f"  {label}: {k1} → {k2}  {arrow}")

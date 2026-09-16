@@ -1,6 +1,6 @@
 ---
 name: slop-gauge
-version: 1.0.1
+version: 1.0.2
 display_name: 去AI味量表（slop-gauge）
 display_name_en: Slop Gauge
 description_zh: 中文文本 AI 痕迹确定性量表。纯标准库零依赖，测五类硬指标——AI 高频词密度、标点画像（破折号/粗体/感叹号）、句长突发性（变异系数）、三段式与否定/判断排比计数、模糊归因命中；支持单文件、目录批量、改写前后 diff 对账，输出 JSON 或人话报告。de-ai 双道门禁的机械侧，与 stop-slop 组队：stop-slop 改，slop-gauge 测。
@@ -45,6 +45,7 @@ cat 文章.md | python scripts/slop_gauge.py -
 
 - `--profile generic | novel | ecommerce`（文章 / 网文对话豁免 / 带货广告法重罚）
 - `--json` 机器可读；默认出人话报告
+- ecommerce 档的人话报告会多印一行「广告法极限词」并列出命中的词——罚分大头在那儿，不印出来就只剩一个没有理由的低分。回测提示：别在改写稿正文里复述极限词来"指出违规"，字面照样计数
 
 ## 指标定义（v1.0.0，全部确定性）
 

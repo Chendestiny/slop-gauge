@@ -42,6 +42,8 @@ python "$env:USERPROFILE\.agents\skills\slop-gauge\scripts\slop_gauge.py" --help
 python scripts/slop_gauge.py --diff 原文.md 改后.md
 ```
 
+ecommerce 档的报告会单独印一行「广告法极限词」并列出命中词（这一档的罚分大头就在这里）；其余档只测通用 AI 痕迹。词表与结构正则都是中文口径，英文稿测不出来，英文 prose 请交给 stop-slop。
+
 ## 与 stop-slop 的分工
 
 stop-slop 改，slop-gauge 测——双道门禁的两端：LLM 出观感五维，机器出死数。两者都过才交付；检测器（朱雀等黑盒）**永远不是判据**。

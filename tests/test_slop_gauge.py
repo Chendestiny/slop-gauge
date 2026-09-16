@@ -10,7 +10,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "scripts"))
 from slop_gauge import load_words, load_adlaw, strip_markup, split_sentences, \
-    rhythm_metrics, word_hits, structure_metrics, punct_metrics, analyze  # noqa: E402
+    rhythm_metrics, word_hits, structure_metrics, punct_metrics, analyze, \
+    fmt_report, fmt_diff  # noqa: E402
 
 class TestLoad(unittest.TestCase):
     def test_loads_default_weight(self):
@@ -103,6 +104,24 @@ class TestPunctScore(unittest.TestCase):
                 "研究表明，这至关重要。总而言之，未来会更加美好。"
                 "展望未来，让我们携手拥抱美好明天。这标志着新篇章的全面开启。")
         self.assertLess(analyze(slop, "generic")["score"], 50)
+
+class TestReport(unittest.TestCase):
+    """ecommerce 档的罚分大头是极限词，报告里必须点名，否则用户只看到一个没理由的低分。"""
+
+    def test_ecommerce_report_names_adlaw_hits(self):
+        rep = fmt_report(analyze("国家级认证，纯天然面料，全网最低价，彻底根治。", "ecommerce"), "x")
+        self.assertIn("广告法极限词", rep)
+        self.assertIn("国家级", rep)
+
+    def test_generic_report_has_no_adlaw_row(self):
+        self.assertNotIn("广告法极限词", fmt_report(analyze("国家级认证。", "generic")))
+
+    def test_ecommerce_diff_has_adlaw_row(self):
+        a = analyze("国家级认证，纯天然，全网最低价。", "ecommerce")
+        b = analyze("有检测报告编号，同期三家实价对比。", "ecommerce")
+        d = fmt_diff(a, b)
+        self.assertIn("广告法极限词/千字", d)
+        self.assertGreater(a["adlaw"]["per_1000"], b["adlaw"]["per_1000"])
 
 class TestCLI(unittest.TestCase):
     def _run(self, *args, **kw):
