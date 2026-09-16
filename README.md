@@ -12,9 +12,19 @@ npx skills add Chendestiny/slop-gauge
 
 > 整个仓库就是一个 skill bundle（根目录 SKILL.md + scripts + 词表），安装时整目录拷入 skills 目录。
 
-**方式一 · de-ai 流水线组件**：
+**方式二 · de-ai 流水线组件**：
 
-装 [de-ai-skills](https://github.com/Chendestiny/de-ai-skills) 后它作为双道门禁的机械臂自动就位。
+装 [de-ai-skills](https://github.com/Chendestiny/de-ai-skills) 后它作为双道门禁的机械臂自动就位（`~/.agents/skills/slop-gauge`）。
+
+```bash
+python ~/.agents/skills/slop-gauge/scripts/slop_gauge.py --help   # bash / zsh
+```
+
+```powershell
+python "$env:USERPROFILE\.agents\skills\slop-gauge\scripts\slop_gauge.py" --help   # Windows
+```
+
+> `~` 在 PowerShell 里不展开，写成 `~/...` 会得到 `can't open file`；Windows 侧用 `$env:USERPROFILE` 或绝对路径。
 
 ## 它是什么
 

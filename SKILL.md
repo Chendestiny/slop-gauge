@@ -1,10 +1,10 @@
 ---
 name: slop-gauge
-version: 1.0.0
+version: 1.0.1
 display_name: 去AI味量表（slop-gauge）
 display_name_en: Slop Gauge
 description_zh: 中文文本 AI 痕迹确定性量表。纯标准库零依赖，测五类硬指标——AI 高频词密度、标点画像（破折号/粗体/感叹号）、句长突发性（变异系数）、三段式与否定/判断排比计数、模糊归因命中；支持单文件、目录批量、改写前后 diff 对账，输出 JSON 或人话报告。de-ai 双道门禁的机械侧，与 stop-slop 组队：stop-slop 改，slop-gauge 测。
-description_en: Deterministic AI-slop meter for Chinese text. Pure-stdlib CLI scores five hard metric families — loansword density, punctuation profile, sentence-length CV, structural triads and contrasts, vague attributions — with single-file, batch and before/after diff modes, JSON or human-readable report. The mechanical arm of the de-ai dual QA gate; team it with stop-slop: stop-slop rewrites, slop-gauge measures.
+description_en: Deterministic AI-slop meter for Chinese text. Pure-stdlib CLI scores five hard metric families - loansword density, punctuation profile, sentence-length CV, structural triads and contrasts, vague attributions - with single-file, batch and before/after diff modes, JSON or human-readable report. The mechanical arm of the de-ai dual QA gate, paired with stop-slop, which rewrites while this measures.
 description: 中文 AI 痕迹确定性量化（词表/标点/节奏/结构/归因五类，可 diff 可批量），de-ai 双道门禁的机械侧。 Deterministic de-AI metrics scorer for Chinese text — stdlib-only, diff-able, batch-able.
 allowed-tools:
   - Bash
@@ -25,6 +25,8 @@ allowed-tools:
 
 ## 用法（全部零依赖零联网）
 
+脚本装在 `~/.agents/skills/slop-gauge/scripts/slop_gauge.py`（或 `~/.dsh/skills/...`）。下面的相对路径写法要先 `cd` 进技能目录；在 agent 里直接调用请用绝对路径——注意 `~` 只有 bash/zsh 会展开，PowerShell 里要用 `$env:USERPROFILE`。
+
 ```bash
 # 单文件
 python scripts/slop_gauge.py 文章.md
@@ -38,6 +40,8 @@ python scripts/slop_gauge.py --diff 原文.md 改后.md
 # 管道
 cat 文章.md | python scripts/slop_gauge.py -
 ```
+
+自检跑通：`python <上面的绝对路径> --help`；回归测试：技能目录下 `python -m unittest discover -s tests`（21 条，纯 stdlib，不需要 pytest）。
 
 - `--profile generic | novel | ecommerce`（文章 / 网文对话豁免 / 带货广告法重罚）
 - `--json` 机器可读；默认出人话报告

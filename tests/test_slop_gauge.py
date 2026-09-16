@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-"""deai-metrics 单测。stdlib unittest；断言不迁就实现，修阈值只去 PROFILES。"""
+"""slop-gauge 单测。stdlib unittest（`python -m unittest discover -s tests`）；断言不迁就实现，修阈值只去 PROFILES。"""
 import json
+import re
 import subprocess
 import sys
 import unittest
@@ -130,6 +131,40 @@ class TestCLI(unittest.TestCase):
         self.assertIn("files", d2)
         self.assertIn("x.md", d2["files"])
         p.unlink()
+
+class TestManifest(unittest.TestCase):
+    """SKILL.md 得能被 agent 的技能加载器认出来：name 合法、description 在位、YAML 不炸。
+    加载器不认目录只认 frontmatter，写坏了就是"装上了但 agent 看不见"。stdlib 检查。"""
+    KEY = re.compile(r'^([A-Za-z0-9_-]+):[ \t]*(.*)$')
+
+    def _fm(self):
+        lines = (REPO / "SKILL.md").read_text(encoding="utf-8").splitlines()
+        self.assertEqual(lines[0].strip(), "---", "SKILL.md 第一行必须是 frontmatter 起始 ---")
+        end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+        self.assertIsNotNone(end, "frontmatter 没有闭合的 ---")
+        return lines[1:end]
+
+    def _values(self):
+        out = {}
+        for line in self._fm():
+            m = self.KEY.match(line)
+            if m:
+                out[m.group(1)] = m.group(2)
+        return out
+
+    def test_name_is_canonical(self):
+        name = self._values().get("name", "").strip().strip('"').strip("'")
+        self.assertEqual(name, "slop-gauge")
+        self.assertRegex(name, r"^[a-z0-9]+(-[a-z0-9]+)*$", "name 必须小写 kebab-case")
+
+    def test_description_present(self):
+        self.assertTrue(self._values().get("description", "").strip(), "缺 description，严格加载器会跳过")
+
+    def test_no_bare_colon_in_values(self):
+        for k, v in self._values().items():
+            if not v or v[0] in '"\'|>[' or v[0] in "&*":
+                continue
+            self.assertNotIn(": ", v, "frontmatter 值 '%s' 里有裸的 ASCII 冒号+空格，YAML 解析会整块失败" % k)
 
 if __name__ == "__main__":
     unittest.main()
